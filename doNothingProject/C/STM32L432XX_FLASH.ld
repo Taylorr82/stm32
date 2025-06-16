@@ -31,6 +31,55 @@ SECTIONS
     *(.text)
     *(.text*)
     . = ALIGN(4);
+
+    /** BEGIN C RUNTIME LINKAGE */
+
+    . = ALIGN(4);
+    KEEP(*(.init))
+    . = ALIGN(4);
+    __preinit_array_start = .;
+    KEEP (*(.preinit_array))
+    __preinit_array_end = .;
+
+    . = ALIGN(4);
+    __init_array_start = .;
+    KEEP (*(SORT(.init_array.*)))
+    KEEP (*(.init_array))
+    __init_array_end = .;
+    . = ALIGN(4);
+    KEEP(*(.fini))
+    . = ALIGN(4);
+    __fini_array_start = .;
+    KEEP (*(.fini_array))
+    KEEP (*(SORT(.fini_array.*)))
+    __fini_array_end = .;
+    . = ALIGN(4);
+    KEEP (*crtbegin.o(.ctors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .ctors))
+    KEEP (*(SORT(.ctors.*)))
+    KEEP (*crtend.o(.ctors))
+
+    . = ALIGN(4);
+    KEEP (*crtbegin.o(.dtors))
+    KEEP (*(EXCLUDE_FILE (*crtend.o) .dtors))
+    KEEP (*(SORT(.dtors.*)))
+    KEEP (*crtend.o(.dtors))
+    . = ALIGN(4);
+    _efixed = .;
+
+    /** END C RUNTIME LINKAGE */
+
+  } > FLASH
+
+  /** ARM exception handling. ARM defines these sections for exception handling */
+  .ARM.extab : {
+      *(.ARM.extab* .gnu.linkonce.armextab.*)
+  } > FLASH
+
+  .ARM.exidx : {
+    PROVIDE(__exidx_start = .);
+    *(.ARM.exidx* .gnu.linkonce.armexidx.*)
+    PROVIDE(__exidx_end = .);
   } > FLASH
 
   .rodata :
@@ -45,7 +94,8 @@ SECTIONS
   {
     . = ALIGN(4);
     _sdata = .;
-    KEEP(*(.data .data.*))
+    *(.data .data.*)
+    *(.ramfunc .ramfunc.*)
     . = ALIGN(4);
     _edata = .;
   } > RAM
@@ -56,7 +106,7 @@ SECTIONS
   {
     . = ALIGN(4);
     _sbss = .;
-    KEEP(*(.bss .bss.*))
+    *(.bss .bss.*)
     *(COMMON)
     . = ALIGN(4);
     _ebss = .;
