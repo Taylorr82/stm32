@@ -13,7 +13,9 @@
 
 .word _sbss
 .word _ebss
-
+.word _sdata
+.word _edata
+.word _sidata
 
     .section	.text.Reset_Handler
 	.weak	Reset_Handler
@@ -39,7 +41,24 @@ LoopZeroFillbss:
 	cmp r2, r3
 	bcc ZeroWritebss
 
-	bl Infinite_Loop
+/* Fall in to copy data */
+
+StartCopyData:
+	movs	r1, #0
+	b LoopCopyData
+
+DoCopyData:
+	ldr	r3, =_sidata
+	ldr	r3, [r3, r1]
+	str	r3, [r0, r1]
+	adds	r1, r1, #4
+
+LoopCopyData:
+	ldr	r0, =_sdata
+	ldr	r3, =_edata
+	adds	r2, r0, r1
+	cmp	r2, r3
+	bcc	DoCopyData
 
 Infinite_Loop:
 	b Infinite_Loop

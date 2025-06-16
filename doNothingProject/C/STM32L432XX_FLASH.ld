@@ -29,6 +29,8 @@ SECTIONS
   {
     . = ALIGN(4);
     *(.text)
+    *(.text*)
+    . = ALIGN(4);
   } > FLASH
 
   .rodata :
@@ -39,6 +41,8 @@ SECTIONS
     . = ALIGN(4);
   } > FLASH
 
+  _sidata = LOADADDR(.data);
+
   .bss (NOLOAD) :
   {
     . = ALIGN(4);
@@ -47,6 +51,15 @@ SECTIONS
     *(COMMON)
     . = ALIGN(4);
     _ebss = .;
+  } > RAM
+
+  .data (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _sdata = .;
+    KEEP(*(.data .data.*))
+    . = ALIGN(4);
+    _edata = .;
   } > RAM
 }
 
