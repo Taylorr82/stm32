@@ -20,9 +20,9 @@ SECTIONS
 {
   .isr_vector :
   {
-    . = ALIGN(8);
+    . = ALIGN(4);
     KEEP(*(.isr_vector)) /* Startup code */
-    . = ALIGN(8);
+    . = ALIGN(4);
   } > FLASH
 
   .text :
@@ -33,11 +33,21 @@ SECTIONS
 
   .rodata :
   {
-    . = ALIGN(8);
+    . = ALIGN(4);
     *(rodata)
     *(.rodata*)
-    . = ALIGN(8);
+    . = ALIGN(4);
   } > FLASH
+
+  .bss (NOLOAD) :
+  {
+    . = ALIGN(4);
+    _sbss = .;
+    KEEP(*(.bss .bss.*))
+    *(COMMON)
+    . = ALIGN(4);
+    _ebss = .;
+  } > RAM
 }
 
 

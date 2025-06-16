@@ -11,19 +11,39 @@
 
 .global	g_pfnVectors
 
+.word _sbss
+.word _ebss
+
+
     .section	.text.Reset_Handler
 	.weak	Reset_Handler
 	.type	Reset_Handler, %function
 Reset_Handler:
 
-/* Copy the data segment initializers from flash to SRAM */
+/* Set up the stack pointer */
     ldr sp,=_estack
-    ldr r10,=0xDEADBEEF // Add a marker to indicate we got to this line
-    bl Infinite_Loop
-    bl	main
+
+/* Fall in to StartZerobss */
+
+StartZerobss:
+	ldr r2, =_sbss
+	ldr r3, =_ebss
+	b LoopZeroFillbss
+
+ZeroWritebss:
+	movs r3, #0 // Load 0 in to r3
+	str r3, [r2] // store 0 at r2
+	adds r2, r2 // Increment r2 
+
+LoopZeroFillbss:
+	cmp r2, r3
+	bcc ZeroWritebss
+
+	bl Infinite_Loop
 
 Infinite_Loop:
-    b Infinite_Loop
+	b Infinite_Loop
+
 
 /******************************************************************************
 *
