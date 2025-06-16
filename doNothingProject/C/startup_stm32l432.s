@@ -29,16 +29,16 @@ Reset_Handler:
 
 StartZerobss:
 	ldr r2, =_sbss
-	ldr r3, =_ebss
+	ldr r4, =_ebss
 	b LoopZeroFillbss
 
 ZeroWritebss:
 	movs r3, #0 // Load 0 in to r3
 	str r3, [r2] // store 0 at r2
-	adds r2, r2 // Increment r2 
+	adds r2, r2, #4 // Increment r2 
 
 LoopZeroFillbss:
-	cmp r2, r3
+	cmp r2, r4
 	bcc ZeroWritebss
 
 /* Fall in to copy data */
@@ -56,9 +56,12 @@ DoCopyData:
 LoopCopyData:
 	ldr	r0, =_sdata
 	ldr	r3, =_edata
-	adds	r2, r0, r1
+	adds r2, r0, r1
 	cmp	r2, r3
 	bcc	DoCopyData
+
+/* Call the C static constructors */
+bl __libc_init_array
 
 Infinite_Loop:
 	b Infinite_Loop
