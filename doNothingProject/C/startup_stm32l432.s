@@ -62,6 +62,7 @@ LoopCopyData:
 
 /* Call the C static constructors */
 bl __libc_init_array
+bl main
 
 Infinite_Loop:
 	b Infinite_Loop
